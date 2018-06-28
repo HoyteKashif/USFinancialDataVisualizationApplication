@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE hibernate-configuration SYSTEM 
+"http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>
+	<session-factory>
+
+		<property name="hibernate.dialect">
+			org.hibernate.dialect.MySQLDialect
+		</property>
+
+		<property name="hibernate.connection.driver_class">
+			com.mysql.jdbc.Driver
+		</property>
+
+		<property name="hibernate.connection.url">
+			jdbc:mysql://localhost:3306/fdic
+		</property>
+		
+		<property name="hibernate.connection.username">
+			fdic_user
+		</property>
+		
+		<property name="hibernate.connection.password">
+			fdic_user_password
+		</property>
+		
+		<property name="hibernate.jdbc.batch_size">
+			50
+		</property>
+
+		<mapping resource="com/usdataproject/data/model/fdic_institution_directory.hbm.xml" />
+		<mapping resource="com/usdataproject/data/model/failure_assistance_transaction.hbm.xml" />
+	</session-factory>
+</hibernate-configuration>

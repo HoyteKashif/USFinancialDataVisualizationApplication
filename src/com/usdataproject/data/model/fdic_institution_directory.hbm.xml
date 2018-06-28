@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC 
+"-//Hibernate/Hibernate Mapping DTD//EN"
+"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.usdataproject.data.model.FdicInstitutionDirectoryRecord"
+		table="fdic_institution_directory">
+
+		<id name="id" type="int" column="directory_item_id">
+			<generator class="native" />
+		</id>
+
+		<property name="directoryItem" column="directory_item" type="string" />
+		<property name="title" column="title" type="string" />
+		<property name="definition" column="definition" type="string" />
+
+	</class>
+</hibernate-mapping>

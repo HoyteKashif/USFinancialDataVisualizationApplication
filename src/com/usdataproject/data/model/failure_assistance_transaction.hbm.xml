@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE hibernate-mapping PUBLIC
+"-//Hibernate/Hibernate Mapping DTD//EN"
+"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+	<class name="com.usdataproject.data.model.FailureAssistanceTransaction"
+		table="failure_assistance_transaction">
+
+		<id name="transactionId" type="int" column="transaction_id">
+			<generator class="native" />
+		</id>
+
+		<property name="institutionName" column="institution_name"
+			type="string" />
+		<property name="cert" column="cert" type="int" />
+		<property name="fin" column="fin" type="int" />
+		<property name="location" column="location" type="string" />
+		<property name="effectiveDate" column="effective_date" type="date" />
+		<property name="insFund" column="ins_fund" type="string" />
+		<property name="transactionType" column="transaction_type"
+			type="string" />
+		<property name="charterClass" column="charter_class" type="string" />
+		<property name="failureOrAssistance" column="failure_or_assistance"
+			type="string" />
+		<property name="totalDeposits" column="total_deposits" type="string" />
+		<property name="totalAssets" column="total_assets" type="string" />
+		<property name="estimatedLoss" column="estimated_loss_as_of_12_3_2016"
+			type="string" />
+
+	</class>
+</hibernate-mapping>
