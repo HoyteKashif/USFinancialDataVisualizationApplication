@@ -52,29 +52,23 @@ public class FdicInstitutionDirectory {
 	}
 
 	public final static void batchFailureAssistanceTransactionsInsert(
-			final List<FailureAssistanceTransaction> p_lstEntries) {
-		Session session = null;
+			final List<FailureAssistanceTransaction> transactions) {
 		SessionFactory factory = new Configuration().configure().buildSessionFactory();
-		session = factory.openSession();
 
-		try {
+		try (final Session session = factory.openSession()) {
 			final Transaction transaction = session.beginTransaction();
-			int iCounter = 0;
-			for (FailureAssistanceTransaction recordModel : p_lstEntries) {
-				session.save(recordModel);
+			int i = 0;
+			for (FailureAssistanceTransaction failureTransaction : transactions) {
+				session.save(failureTransaction);
 
-				if (iCounter % 50 == 0) {
+				if (i % 50 == 0) {
 					session.flush();
 					session.clear();
 				}
 
-				iCounter++;
+				i++;
 			}
 			transaction.commit();
-		} finally {
-			if (null != session) {
-				session.close();
-			}
 		}
 	}
 

@@ -15,7 +15,7 @@ import com.usdataproject.data.model.FailureAssistanceTransaction;
 import com.usdataproject.data.model.FdicInstitutionDirectoryRecord;
 import com.usdataproject.util.db.FdicInstitutionDirectory;
 
-public class InstitutionDataApplication {
+public final class InstitutionDataApplication {
 
 	public static void main(String[] args) {
 
@@ -46,9 +46,24 @@ public class InstitutionDataApplication {
 		}
 	}
 
+	private static void print(final FailureAssistanceTransaction transaction) {
+		System.out.println(transaction.getInstitutionName());
+		System.out.println(transaction.getCert());
+		System.out.println(transaction.getFin());
+		System.out.println(transaction.getLocation());
+		System.out.println(transaction.getEffectiveDate());
+		System.out.println(transaction.getInsFund());
+		System.out.println(transaction.getTransactionType());
+		System.out.println(transaction.getCharterClass());
+		System.out.println(transaction.getFailureOrAssistance());
+		System.out.println(transaction.getTotalDeposits());
+		System.out.println(transaction.getTotalAssets());
+		System.out.println(transaction.getEstimatedLoss());
+	}
+
 	public static void loadFailureAssistanceTransaction() {
 		try (final Scanner fileScanner = new Scanner(new FileInputStream("data/hsobReportDataOnly.csv"))) {
-			final ArrayList<FailureAssistanceTransaction> transactionList = new ArrayList<>();
+			final ArrayList<FailureAssistanceTransaction> transactions = new ArrayList<>();
 
 			while (fileScanner.hasNext()) {
 				final String nextLine = fileScanner.nextLine();
@@ -58,49 +73,24 @@ public class InstitutionDataApplication {
 					final Iterator<String> iterator = newDataIterator(nextLine);
 
 					final FailureAssistanceTransaction transaction = new FailureAssistanceTransaction();
-
-					// private String institutionName;
 					transaction.setInstitutionName(getNextString(iterator));
-					// System.out.println(transaction.getInstitutionName());
-					// private Integer cert;
 					transaction.setCert(getNextInt(iterator));
-					// System.out.println(transaction.getCert());
-					// private Integer fin;
 					transaction.setFin(getNextInt(iterator));
-					// System.out.println(transaction.getFin());
-					// private String location;
 					transaction.setLocation(getNextString(iterator));
-					// System.out.println(transaction.getLocation());
-					// private Date effectiveDate;
 					transaction.setEffectiveDate(getNextDate(iterator));
-					// System.out.println(transaction.getEffectiveDate());
-					// private String insFund;
 					transaction.setInsFund(getNextString(iterator));
-					// System.out.println(transaction.getInsFund());
-					// private String transactionType;
 					transaction.setTransactionType(getNextString(iterator));
-					// System.out.println(transaction.getTransactionType());
-					// private String charterClass;
 					transaction.setCharterClass(getNextString(iterator));
-					// System.out.println(transaction.getCharterClass());
-					// private String failureOrAssistance;
 					transaction.setFailureOrAssistance(getNextString(iterator));
-					// System.out.println(transaction.getFailureOrAssistance());
-					// private String totalDeposits;
 					transaction.setTotalDeposits(getNextString(iterator));
-					// System.out.println(transaction.getTotalDeposits());
-					// private String totalAssets;
 					transaction.setTotalAssets(getNextString(iterator));
-					// System.out.println(transaction.getTotalAssets());
-					// private String estimatedLossAsOf_12_3_2016;
 					transaction.setEstimatedLoss(getNextString(iterator));
-					// System.out.println(transaction.getEstimatedLossAsof_12_3_2016());
 
-					transactionList.add(transaction);
+					transactions.add(transaction);
 				}
 			}
 
-			FdicInstitutionDirectory.batchFailureAssistanceTransactionsInsert(transactionList);
+			FdicInstitutionDirectory.batchFailureAssistanceTransactionsInsert(transactions);
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
@@ -130,19 +120,19 @@ public class InstitutionDataApplication {
 		return list.iterator();
 	}
 
-	private static boolean hasNext(final Iterator<String> p_oIterator) {
-		if (null != p_oIterator && p_oIterator.hasNext()) {
+	private static boolean hasNext(final Iterator<String> iterator) {
+		if (null != iterator && iterator.hasNext()) {
 			return true;
 		}
 		return false;
 	}
 
-	private static boolean isApplicableValue(final String p_strData) {
-		if (null == p_strData) {
+	private static boolean isApplicableValue(final String data) {
+		if (null == data) {
 			return false;
 		}
 
-		final String trimmedValue = p_strData.trim();
+		final String trimmedValue = data.trim();
 		if (trimmedValue.isEmpty()) {
 			return false;
 		}
@@ -150,9 +140,9 @@ public class InstitutionDataApplication {
 		return !"N/A".equals(trimmedValue);
 	}
 
-	private static String getNextString(final Iterator<String> p_oIterator) {
-		if (hasNext(p_oIterator)) {
-			final String string = p_oIterator.next().trim();
+	private static String getNextString(final Iterator<String> iterator) {
+		if (hasNext(iterator)) {
+			final String string = iterator.next().trim();
 			if (isApplicableValue(string)) {
 				return string;
 			}
@@ -161,9 +151,9 @@ public class InstitutionDataApplication {
 		return null;
 	}
 
-	private static Integer getNextInt(final Iterator<String> p_oIterator) {
-		if (hasNext(p_oIterator)) {
-			final String string = p_oIterator.next().trim();
+	private static Integer getNextInt(final Iterator<String> iterator) {
+		if (hasNext(iterator)) {
+			final String string = iterator.next().trim();
 			if (isApplicableValue(string)) {
 				return new Integer(string);
 			}
@@ -193,9 +183,9 @@ public class InstitutionDataApplication {
 		}
 	}
 
-	private static Date getNextDate(final Iterator<String> p_oIterator) {
-		if (hasNext(p_oIterator)) {
-			final String string = p_oIterator.next().trim();
+	private static Date getNextDate(final Iterator<String> iterator) {
+		if (hasNext(iterator)) {
+			final String string = iterator.next().trim();
 			if (isApplicableValue(string)) {
 				if (Pattern.compile("\\d{2}/\\d{2}/\\d{4}").matcher(string).find()) {
 					return Date.valueOf(LocalDate.from(DateTimeFormatter.ofPattern("MM/dd/yyyy").parse(string)));
