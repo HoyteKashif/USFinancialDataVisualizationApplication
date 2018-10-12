@@ -7,8 +7,6 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.regex.Pattern;
 
-import sun.applet.Main;
-
 public class StringHelper {
 
 	public static final String EMPTY_STRING = "";

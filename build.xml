@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project default="compile" name="USFinanceDataProject" basedir=".">
+
+	<target name="compile">
+		<mkdir dir="bin"/>
+		<javac includeantruntime="false" destdir="bin" target="1.8" debug="true" source="1.8" srcdir="src"></javac>
+	</target>
+</project>
