@@ -4,7 +4,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -18,7 +17,7 @@ import org.hibernate.cfg.Configuration;
 
 import com.usdataproject.data.model.FailureAssistanceTransaction;
 import com.usdataproject.data.model.FdicInstitutionDirectoryRecord;
-import com.usdataproject.util.helper.ValidationHelper;
+import com.usdataproject.util.helper.StringHelper;
 
 /**
  * create table if not exists fdic_institution_directory ( directory_item_id INT
@@ -34,17 +33,16 @@ public class FdicInstitutionDirectory {
 	public final static void batchInsert(final List<FdicInstitutionDirectoryRecord> p_lstRecords) {
 		final Connection connection = FdicDatabaseHelper.getConnectionAsFdicUser();
 		try {
-			final PreparedStatement statement = connection.prepareStatement(
+			final PreparedStatement stat = connection.prepareStatement(
 					"insert into fdic.fdic_institution_directory (directory_item, title, definition) values(?,?,?)");
 			for (FdicInstitutionDirectoryRecord directoryRecord : p_lstRecords) {
-				statement.setString(IDX_DIRECTORY_ITEM,
-						ValidationHelper.getTrimmedStringOrNull(directoryRecord.getDirectoryItem()));
-				statement.setString(IDX_TITLE, ValidationHelper.getTrimmedStringOrNull(directoryRecord.getTitle()));
-				statement.setString(IDX_DEFINITION,
-						ValidationHelper.getTrimmedStringOrNull(directoryRecord.getDefinition()));
-				statement.addBatch();
+				stat.setString(IDX_DIRECTORY_ITEM,
+						StringHelper.getTrimmedStringOrNull(directoryRecord.getDirectoryItem()));
+				stat.setString(IDX_TITLE, StringHelper.getTrimmedStringOrNull(directoryRecord.getTitle()));
+				stat.setString(IDX_DEFINITION, StringHelper.getTrimmedStringOrNull(directoryRecord.getDefinition()));
+				stat.addBatch();
 			}
-			statement.executeBatch();
+			stat.executeBatch();
 
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -72,29 +70,10 @@ public class FdicInstitutionDirectory {
 		}
 	}
 
-	// InsertIntocreate table if not exists failure_assistance_transactions
-	// (
-	// transaction_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-	// institution_name VARCHAR(100),
-	// cert INT,
-	// fin INT,
-	// location VARCHAR(100),
-	// effective_date DATE,
-	// ins_fund VARCHAR(20),
-	// transaction_type VARCHAR(20),
-	// charter_class VARCHAR(20),
-	// failure_or_assistance VARCHAR(20),
-	// total_deposits VARCHAR(20),
-	// total_assets VARCHAR(20),
-	// estimated_loss_as_12_3_2016 VARCHAR(20)
-	// )
-	// ;
-
 	public static void readAllFdicDirectoryRecords() {
-		Session session = null;
-		try {
-			SessionFactory factory = new Configuration().configure().buildSessionFactory();
-			session = factory.openSession();
+
+		try (Session session = new Configuration().configure().buildSessionFactory().openSession()) {
+
 			Transaction transaction = session.beginTransaction();
 
 			EntityManager entityManager = session.getEntityManagerFactory().createEntityManager();
@@ -103,36 +82,25 @@ public class FdicInstitutionDirectory {
 
 			CriteriaQuery<FdicInstitutionDirectoryRecord> query = criteriaBuilder
 					.createQuery(FdicInstitutionDirectoryRecord.class);
-			// setting the from clause
 			query.select(query.from(FdicInstitutionDirectoryRecord.class));
 
-			List<FdicInstitutionDirectoryRecord> lstRecords = session.createQuery(query).getResultList();
-			for (Iterator<FdicInstitutionDirectoryRecord> iterator = lstRecords.iterator(); iterator.hasNext();) {
-				FdicInstitutionDirectoryRecord record = (FdicInstitutionDirectoryRecord) iterator.next();
+			for (FdicInstitutionDirectoryRecord record : session.createQuery(query).getResultList()) {
 				System.out.println("id: " + record.getId() + " directory item: " + record.getDirectoryItem());
 			}
-			transaction.commit();
-		} catch (Throwable e) {
-			System.err.println("Failed to create sessionFactory object." + e);
-		} finally {
-			if (null != session) {
-				session.close();
-			}
-		}
 
+			transaction.commit();
+		}
 	}
 
 	public static void getAllFdicDirectoryEntries() {
 		try {
 			Connection connection = FdicDatabaseHelper.getConnectionAsFdicUser();
 
-			final ResultSet resultSet = connection.createStatement()
-					.executeQuery("select * from fdic_institution_directory");
+			final ResultSet rs = connection.createStatement().executeQuery("select * from fdic_institution_directory");
 
-			if (resultSet.next()) {
+			if (rs.next()) {
 				System.out.println("found data");
 			}
-			System.out.println("connection was good");
 
 		} catch (SQLException e) {
 			e.printStackTrace();

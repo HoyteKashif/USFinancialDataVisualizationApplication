@@ -30,10 +30,10 @@ public final class InstitutionDataApplication {
 			final ArrayList<FdicInstitutionDirectoryRecord> lstRecords = new ArrayList<>();
 
 			while (fileScanner.hasNext()) {
-				final String nextLine = fileScanner.nextLine();
+				final String line = fileScanner.nextLine();
 
-				if (!nextLine.isEmpty()) {
-					final String[] lineArray = nextLine.split(",", 3);
+				if (!line.isEmpty()) {
+					final String[] lineArray = line.split(",", 3);
 
 					lstRecords.add(new FdicInstitutionDirectoryRecord(lineArray[0], lineArray[1], lineArray[2]));
 				}
@@ -66,25 +66,25 @@ public final class InstitutionDataApplication {
 			final ArrayList<FailureAssistanceTransaction> transactions = new ArrayList<>();
 
 			while (fileScanner.hasNext()) {
-				final String nextLine = fileScanner.nextLine();
+				final String line = fileScanner.nextLine();
 
-				if (!nextLine.isEmpty()) {
+				if (!line.isEmpty()) {
 
-					final Iterator<String> iterator = newDataIterator(nextLine);
+					final Iterator<String> itr = newIterator(line);
 
 					final FailureAssistanceTransaction transaction = new FailureAssistanceTransaction();
-					transaction.setInstitutionName(getNextString(iterator));
-					transaction.setCert(getNextInt(iterator));
-					transaction.setFin(getNextInt(iterator));
-					transaction.setLocation(getNextString(iterator));
-					transaction.setEffectiveDate(getNextDate(iterator));
-					transaction.setInsFund(getNextString(iterator));
-					transaction.setTransactionType(getNextString(iterator));
-					transaction.setCharterClass(getNextString(iterator));
-					transaction.setFailureOrAssistance(getNextString(iterator));
-					transaction.setTotalDeposits(getNextString(iterator));
-					transaction.setTotalAssets(getNextString(iterator));
-					transaction.setEstimatedLoss(getNextString(iterator));
+					transaction.setInstitutionName(nextString(itr));
+					transaction.setCert(nextInt(itr));
+					transaction.setFin(nextInt(itr));
+					transaction.setLocation(nextString(itr));
+					transaction.setEffectiveDate(getNextDate(itr));
+					transaction.setInsFund(nextString(itr));
+					transaction.setTransactionType(nextString(itr));
+					transaction.setCharterClass(nextString(itr));
+					transaction.setFailureOrAssistance(nextString(itr));
+					transaction.setTotalDeposits(nextString(itr));
+					transaction.setTotalAssets(nextString(itr));
+					transaction.setEstimatedLoss(nextString(itr));
 
 					transactions.add(transaction);
 				}
@@ -96,39 +96,38 @@ public final class InstitutionDataApplication {
 		}
 	}
 
-	private static Iterator<String> newDataIterator(final String p_strData) {
-		String string = new String(p_strData);
+	private static Iterator<String> newIterator(final String data) {
 		final LinkedList<String> list = new LinkedList<>();
 
-		while (!string.isEmpty()) {
-			if (string.charAt(0) == '"') {
-				list.add(string.substring(1, string.indexOf('"', 1)));
-				string = new String(string.substring(string.indexOf('"', 1) + 2));
+		String s = new String(data);
+		while (!s.isEmpty()) {
+			if (s.charAt(0) == '"') {
+				list.add(s.substring(1, s.indexOf('"', 1)));
+				s = s.substring(s.indexOf('"', 1) + 2);
 			} else {
-				final int iCommaIndex = string.indexOf(',');
-				if (iCommaIndex >= 0) {
-					list.add(string.substring(0, iCommaIndex));
-					string = new String(string.substring(string.indexOf(',', 1) + 1));
+				final int commaIdx = s.indexOf(',');
+				if (commaIdx > -1) {
+					list.add(s.substring(0, commaIdx));
+					s = s.substring(s.indexOf(',', 1) + 1);
 				} else {
-					list.add(string.substring(0));
-					string = "";
+					list.add(s.substring(0));
+					s = "";
 				}
-
 			}
 		}
 
 		return list.iterator();
 	}
 
-	private static boolean hasNext(final Iterator<String> iterator) {
-		if (null != iterator && iterator.hasNext()) {
+	private static boolean hasNext(final Iterator<String> itr) {
+		if (itr != null && itr.hasNext()) {
 			return true;
 		}
 		return false;
 	}
 
 	private static boolean isApplicableValue(final String data) {
-		if (null == data) {
+		if (data == null) {
 			return false;
 		}
 
@@ -140,9 +139,9 @@ public final class InstitutionDataApplication {
 		return !"N/A".equals(trimmedValue);
 	}
 
-	private static String getNextString(final Iterator<String> iterator) {
-		if (hasNext(iterator)) {
-			final String string = iterator.next().trim();
+	private static String nextString(final Iterator<String> itr) {
+		if (hasNext(itr)) {
+			final String string = itr.next().trim();
 			if (isApplicableValue(string)) {
 				return string;
 			}
@@ -151,9 +150,9 @@ public final class InstitutionDataApplication {
 		return null;
 	}
 
-	private static Integer getNextInt(final Iterator<String> iterator) {
-		if (hasNext(iterator)) {
-			final String string = iterator.next().trim();
+	private static Integer nextInt(final Iterator<String> itr) {
+		if (hasNext(itr)) {
+			final String string = itr.next().trim();
 			if (isApplicableValue(string)) {
 				return new Integer(string);
 			}
@@ -166,26 +165,26 @@ public final class InstitutionDataApplication {
 		M_D_YYYY("\\d{1}/\\d{1}/\\d{4}", "M/d/yyyy"), M_DD_YYYY("\\d{1}/\\d{2}/\\d{4}",
 				"M/dd/yyyy"), MM_DD_YYYY("\\d{2}/\\d{2}/\\d{4}", "MM/dd/yyyy");
 
-		private final String strRegExp;
-		private final String strFormat;
+		private final String regexp;
+		private final String format;
 
-		private DateFormatEnum(final String p_strRegExp, final String p_strFormat) {
-			this.strRegExp = p_strRegExp;
-			this.strFormat = p_strFormat;
+		private DateFormatEnum(final String p_regexp, final String p_format) {
+			this.regexp = p_regexp;
+			this.format = p_format;
 		}
 
 		public String getRegExp() {
-			return strRegExp;
+			return regexp;
 		}
 
 		public String getFormat() {
-			return strFormat;
+			return format;
 		}
 	}
 
-	private static Date getNextDate(final Iterator<String> iterator) {
-		if (hasNext(iterator)) {
-			final String string = iterator.next().trim();
+	private static Date getNextDate(final Iterator<String> itr) {
+		if (hasNext(itr)) {
+			final String string = itr.next().trim();
 			if (isApplicableValue(string)) {
 				if (Pattern.compile("\\d{2}/\\d{2}/\\d{4}").matcher(string).find()) {
 					return Date.valueOf(LocalDate.from(DateTimeFormatter.ofPattern("MM/dd/yyyy").parse(string)));

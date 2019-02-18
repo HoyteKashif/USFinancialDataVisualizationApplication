@@ -1,7 +1,6 @@
 package com.usdataproject.util.db;
 
 import java.sql.Connection;
-import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -29,17 +28,19 @@ public class FdicDatabaseHelper {
 	}
 
 	public static void printMetaData() {
-		try {
-			Connection connection = getConnectionAsFdicUser();
-			DatabaseMetaData metaData = connection.getMetaData();
-			ResultSet resultSet = metaData.getTables(null, null, "", new String[] { "TABLE" });
+		try (Connection conn = getConnectionAsFdicUser()) {
 
-			while (resultSet.next()) {
-				System.out.println(resultSet.getString("TABLE_NAME"));
+			ResultSet rs = conn.getMetaData().getTables(null, null, "", new String[] { "TABLE" });
+			while (rs.next()) {
+				System.out.println(rs.getString("TABLE_NAME"));
 			}
 
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+	}
+
+	public static void main(String[] args) {
+		printMetaData();
 	}
 }

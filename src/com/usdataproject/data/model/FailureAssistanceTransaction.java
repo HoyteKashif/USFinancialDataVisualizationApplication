@@ -21,27 +21,31 @@ public class FailureAssistanceTransaction {
 	public FailureAssistanceTransaction() {
 	}
 
-	public FailureAssistanceTransaction(final Integer p_transactionId, final String p_institutionName,
-			final Integer p_cert, final Integer p_fin, final String p_location, final Date p_effectiveDate,
-			final String p_insFund, final String p_transactionType, final String p_charterClass,
-			final String p_failureOrAssistance, final String p_totalDeposits, final String p_totalAssets,
-			final String p_estimatedLoss) {
-
-		this.transactionId = p_transactionId;
-		this.institutionName = p_institutionName;
-		this.cert = p_cert;
-		this.fin = p_fin;
-		this.location = p_location;
-		this.effectiveDate = p_effectiveDate;
-		this.insFund = p_insFund;
-		this.transactionType = p_transactionType;
-		this.charterClass = p_charterClass;
-		this.failureOrAssistance = p_failureOrAssistance;
-		this.totalDeposits = p_totalDeposits;
-		this.totalAssets = p_totalAssets;
-		this.estimatedLoss = p_estimatedLoss;
-
-	}
+	// public FailureAssistanceTransaction(final Integer p_transactionId, final
+	// String p_institutionName,
+	// final Integer p_cert, final Integer p_fin, final String p_location, final
+	// Date p_effectiveDate,
+	// final String p_insFund, final String p_transactionType, final String
+	// p_charterClass,
+	// final String p_failureOrAssistance, final String p_totalDeposits, final
+	// String p_totalAssets,
+	// final String p_estimatedLoss) {
+	//
+	// this.transactionId = p_transactionId;
+	// this.institutionName = p_institutionName;
+	// this.cert = p_cert;
+	// this.fin = p_fin;
+	// this.location = p_location;
+	// this.effectiveDate = p_effectiveDate;
+	// this.insFund = p_insFund;
+	// this.transactionType = p_transactionType;
+	// this.charterClass = p_charterClass;
+	// this.failureOrAssistance = p_failureOrAssistance;
+	// this.totalDeposits = p_totalDeposits;
+	// this.totalAssets = p_totalAssets;
+	// this.estimatedLoss = p_estimatedLoss;
+	//
+	// }
 
 	public Integer getTransactionId() {
 		return transactionId;

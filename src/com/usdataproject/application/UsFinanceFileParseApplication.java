@@ -2,42 +2,54 @@ package com.usdataproject.application;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.sql.Date;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
 import com.usdataproject.data.model.Institution;
-import com.usdataproject.util.helper.InstitutionDataStaticValues.InstitutionDataColumnEnum;
+import com.usdataproject.util.helper.InstitutionDataColumnEnum;
 import com.usdataproject.util.helper.StringHelper;
 
 public class UsFinanceFileParseApplication {
+
+	public static void main1(String[] args) {
+		String s1 = "Nebraska,5371,12383,0,103 South Fourth Street,\"39,078\",N,223,0,0,0,0,3960,OCC,N,Albion,3,0,,Boone,2005-11-14,00000,\"33,253\",2005-11-10,2005-11-10,,1879-01-01,11,Kansas City,Kansas City,10,395452,1,Grand Island,0,1,BIF,,1934-01-01,00000,1,1,0,1,0,0,0,,The First National Bank of Albion,31999,0,5,West,2005-11-14,4,OCC,2005-09-30,2017-09-30,0,,,,,2017-12-28,0,N,NE,31011,31,68620,11,4,3624,31999,31DEC9999,31DEC9999,0,,,,,,,,,,,,,,,,,,,1,,,,,,,,,,,,,,,,,,,,,,,,,,0,0,,0,,0,0,0,,0,0,";
+		System.out.println(s1);
+		List<String> list = newDataIterator(s1);
+		System.out.println(list.size());
+		System.out.println(InstitutionDataColumnEnum.values().length);
+		for (String s : list) {
+			System.out.println("s:(" + s + ")");
+		}
+	}
 
 	public static void main(String[] args) {
 		try (final Scanner fileScanner = new Scanner(new FileInputStream("data/institutions2_dataOnly.csv"))) {
 
 			while (fileScanner.hasNext()) {
 
-				final String nextLine = fileScanner.nextLine();
+				final String line = fileScanner.nextLine();
 
-				if (!nextLine.isEmpty()) {
-					final List<String> list = newDataIterator(nextLine);
+				if (!line.isEmpty()) {
+					final List<String> list = newDataIterator(line);
 
 					final Institution institution = new Institution();
 
 					// STNAME (state_name)
-					institution
-							.setStname(StringHelper.stringOrNull(list.get(InstitutionDataColumnEnum.STNAME.ordinal())));
+					institution.setStname(nextString(list, InstitutionDataColumnEnum.STNAME));
 					// CERT (fdic_cert)
-					institution.setCert(integerOrNull(list.get(InstitutionDataColumnEnum.CERT.ordinal())));
+					institution.setCert(nextInt(list, InstitutionDataColumnEnum.CERT));
 					// DOCKET (ots_docket_number)
-					institution.setDocket(integerOrNull(list.get(InstitutionDataColumnEnum.DOCKET.ordinal())));
+					institution.setDocket(nextInt(list, InstitutionDataColumnEnum.DOCKET));
 					// ACTIVE (active)
-					institution.setActive(
-							StringHelper.booleanOrNull(list.get(InstitutionDataColumnEnum.ACTIVE.ordinal())));
+					institution.setActive(nextBoolean(list, InstitutionDataColumnEnum.ACTIVE));
 					// ADDRESS
-					institution.setAddress(
-							StringHelper.stringOrNull(list.get(InstitutionDataColumnEnum.ADDRESS.ordinal())));
+					institution.setAddress(nextString(list, InstitutionDataColumnEnum.ADDRESS));
 					// ASSET
 					institution.setAsset(StringHelper
 							.bigIntegerOrNull(list.get(InstitutionDataColumnEnum.ASSET.ordinal()).replaceAll(",", "")));
@@ -74,9 +86,11 @@ public class UsFinanceFileParseApplication {
 					// CITY
 					institution.setCity(list.get(InstitutionDataColumnEnum.CITY.ordinal()));
 					// CLCODE
-					institution.setClcode(integerOrNull(list.get(InstitutionDataColumnEnum.CLCODE.ordinal())));
+					institution.setClcode(
+							StringHelper.integerOrNull(list.get(InstitutionDataColumnEnum.CLCODE.ordinal())));
 					// CMSA_NO
-					institution.setCmsa_no(integerOrNull(list.get(InstitutionDataColumnEnum.CMSA_NO.ordinal())));
+					institution.setCmsa_no(
+							StringHelper.integerOrNull(list.get(InstitutionDataColumnEnum.CMSA_NO.ordinal())));
 					// CMSA
 					institution.setCmsa(StringHelper.stringOrNull(list.get(InstitutionDataColumnEnum.CMSA.ordinal())));
 					/**
@@ -92,8 +106,8 @@ public class UsFinanceFileParseApplication {
 					institution
 							.setDenovo(StringHelper.stringOrNull(list.get(InstitutionDataColumnEnum.DENOVO.ordinal())));
 					// DEP
-					institution.setDep(
-							integerOrNull(list.get(InstitutionDataColumnEnum.DEP.ordinal()).replaceAll(",", "")));
+					institution.setDep(StringHelper
+							.integerOrNull(list.get(InstitutionDataColumnEnum.DEP.ordinal()).replaceAll(",", "")));
 					// EFFDATE
 					institution
 							.setEffdate(StringHelper.dateOrNull(list.get(InstitutionDataColumnEnum.EFFDATE.ordinal())));
@@ -101,8 +115,8 @@ public class UsFinanceFileParseApplication {
 					institution.setEndefymd(
 							StringHelper.dateOrNull(list.get(InstitutionDataColumnEnum.ENDEFYMD.ordinal())));
 					// EQ
-					institution
-							.setEq(integerOrNull(list.get(InstitutionDataColumnEnum.EQ.ordinal()).replaceAll(",", "")));
+					institution.setEq(StringHelper
+							.integerOrNull(list.get(InstitutionDataColumnEnum.EQ.ordinal()).replaceAll(",", "")));
 					// ESTYMD
 					institution
 							.setEstymd(StringHelper.dateOrNull(list.get(InstitutionDataColumnEnum.ESTYMD.ordinal())));
@@ -123,7 +137,8 @@ public class UsFinanceFileParseApplication {
 					// FED
 					institution.setFed(Byte.valueOf(list.get(InstitutionDataColumnEnum.FED.ordinal())));
 					// FED_RSSD {minimum=0 and max=5143788}
-					institution.setFed_rssd(integerOrNull(list.get(InstitutionDataColumnEnum.FED_RSSD.ordinal())));
+					institution.setFed_rssd(
+							StringHelper.integerOrNull(list.get(InstitutionDataColumnEnum.FED_RSSD.ordinal())));
 					// FEDCHRTR {false=0,true=1}
 					institution.setFedchrtr(
 							StringHelper.booleanOrNull(list.get(InstitutionDataColumnEnum.FEDCHRTR.ordinal())));
@@ -169,22 +184,21 @@ public class UsFinanceFileParseApplication {
 					institution.setInssave(
 							StringHelper.booleanOrNull(list.get(InstitutionDataColumnEnum.INSSAVE.ordinal())));
 					// MSA_NO
-					institution.setMsa_no(integerOrNull(list.get(InstitutionDataColumnEnum.MSA_NO.ordinal())));
+					institution.setMsa_no(
+							StringHelper.integerOrNull(list.get(InstitutionDataColumnEnum.MSA_NO.ordinal())));
 					/**
 					 * TODO: create dictionary table
 					 */
 					// MSA
-					institution.setMsa(StringHelper.stringOrNull(list.get(InstitutionDataColumnEnum.MSA.ordinal())));
+					institution.setMsa(nextString(list, InstitutionDataColumnEnum.MSA));
 					// NAME
-					institution.setName(StringHelper.stringOrNull(list.get(InstitutionDataColumnEnum.NAME.ordinal())));
+					institution.setName(nextString(list, InstitutionDataColumnEnum.NAME));
 					// NEWCERT
-					institution.setNewcert(integerOrNull(list.get(InstitutionDataColumnEnum.NEWCERT.ordinal())));
+					institution.setNewcert(nextInt(list, InstitutionDataColumnEnum.NEWCERT));
 					// OAKAR
-					institution
-							.setOakar(StringHelper.booleanOrNull(list.get(InstitutionDataColumnEnum.OAKAR.ordinal())));
+					institution.setOakar(nextBoolean(list, InstitutionDataColumnEnum.OAKAR));
 					// OTSDIST
-					institution
-							.setOtsdist(StringHelper.byteOrNull(list.get(InstitutionDataColumnEnum.OTSDIST.ordinal())));
+					institution.setOtsdist(nextByte(list, InstitutionDataColumnEnum.OTSDIST));
 					// OTSREGNM
 					institution.setOtsregnm(
 							StringHelper.stringOrNull(list.get(InstitutionDataColumnEnum.OTSREGNM.ordinal())));
@@ -195,21 +209,17 @@ public class UsFinanceFileParseApplication {
 					institution.setQbprcoml(
 							StringHelper.byteOrNull(list.get(InstitutionDataColumnEnum.QBPRCOML.ordinal())));
 					// REGAGNT
-					institution.setRegagnt(
-							StringHelper.stringOrNull(list.get(InstitutionDataColumnEnum.REGAGNT.ordinal())));
+					institution.setRegagnt(nextData(list, InstitutionDataColumnEnum.REGAGNT, String.class));
 					// REPDTE
-					institution
-							.setRepdte(StringHelper.dateOrNull(list.get(InstitutionDataColumnEnum.REPDTE.ordinal())));
+					institution.setRepdte(nextData(list, InstitutionDataColumnEnum.REPDTE, Date.class));
 					// RISDATE
-					institution
-							.setRisdate(StringHelper.dateOrNull(list.get(InstitutionDataColumnEnum.RISDATE.ordinal())));
+					institution.setRisdate(nextData(list, InstitutionDataColumnEnum.RISDATE, Date.class));
 					// STCHRTR
-					institution.setStchrtr(
-							StringHelper.booleanOrNull(list.get(InstitutionDataColumnEnum.STCHRTR.ordinal())));
+					institution.setStchrtr(nextData(list, InstitutionDataColumnEnum.STCHRTR, Boolean.class));
 					// ROA
-					institution.setRoa(StringHelper.floatOrNull(list.get(InstitutionDataColumnEnum.ROA.ordinal())));
+					institution.setRoa(nextFloat(list, InstitutionDataColumnEnum.ROA));
 					// ROAQ
-					institution.setRoaq(nextData(list, InstitutionDataColumnEnum.ROAQ, Float.class));
+					institution.setRoaq(nextFloat(list, InstitutionDataColumnEnum.ROAQ));
 					// ROE
 					institution.setRoe(nextData(list, InstitutionDataColumnEnum.ROE, Float.class));
 					// ROEQ
@@ -217,7 +227,7 @@ public class UsFinanceFileParseApplication {
 					// RUNDATE
 					nextData(list, InstitutionDataColumnEnum.RUNDATE, Date.class);
 					// SASSER {0 or 1}
-					StringHelper.booleanOrNull(list.get(InstitutionDataColumnEnum.SASSER.ordinal()));
+					nextData(list, InstitutionDataColumnEnum.SASSER, Boolean.class);
 					// LAW_SASSER_FLG {N or Y}
 					nextData(list, InstitutionDataColumnEnum.LAW_SASSER_FLG, Boolean.class);
 					// STALP
@@ -263,60 +273,101 @@ public class UsFinanceFileParseApplication {
 					// TE09N528
 					nextData(list, InstitutionDataColumnEnum.TE09N528, String.class);
 					// TE10N528
-					nextData(list, InstitutionDataColumnEnum.TE10N528, String.class);
+					nextString(list, InstitutionDataColumnEnum.TE10N528);
 					// TE01N529
-					nextData(list, InstitutionDataColumnEnum.TE01N529, String.class);
+					nextString(list, InstitutionDataColumnEnum.TE01N529);
 					// TE02N529
-					nextData(list, InstitutionDataColumnEnum.TE02N529, String.class);
+					nextString(list, InstitutionDataColumnEnum.TE02N529);
 					// TE03N529
-					nextData(list, InstitutionDataColumnEnum.TE03N529, String.class);
+					nextString(list, InstitutionDataColumnEnum.TE03N529);
 					// TE04N529
-					nextData(list, InstitutionDataColumnEnum.TE04N529, String.class);
+					nextString(list, InstitutionDataColumnEnum.TE04N529);
 					// TE05N529
-					nextData(list, InstitutionDataColumnEnum.TE05N529, String.class);
+					nextString(list, InstitutionDataColumnEnum.TE05N529);
 					// TE06N529
-					nextData(list, InstitutionDataColumnEnum.TE06N529, String.class);
+					nextString(list, InstitutionDataColumnEnum.TE06N529);
 					// WEBADDR
-					nextData(list, InstitutionDataColumnEnum.WEBADDR, String.class);
+					nextString(list, InstitutionDataColumnEnum.WEBADDR);
 					// OFFICES
-					nextData(list, InstitutionDataColumnEnum.OFFICES, Integer.class);
+					nextInt(list, InstitutionDataColumnEnum.OFFICES);
 					// CERTCONS
-					String string = nextData(list, InstitutionDataColumnEnum.CERTCONS, String.class);
-					if (string != null) {
-						Integer i = Integer.valueOf(string);
-						if (i != 0 && i != 1) {
-							System.out.println(i);
-						}
-					}
-
-					// System.out.println(nextData(list,
-					// InstitutionDataColumnEnum.CERTCONS, String.class));
+					nextInt(list, InstitutionDataColumnEnum.CERTCONS);
 					// PARCERT
-					nextData(list, InstitutionDataColumnEnum.PARCERT, String.class);
+					nextInt(list, InstitutionDataColumnEnum.PARCERT);
 					// CITYHCR
-					// System.out.println(nextData(list,
-					// InstitutionDataColumnEnum.CITYHCR, String.class));
+					nextString(list, InstitutionDataColumnEnum.CITYHCR);
 					// DEPDOM
-					// System.out.println(nextData(list,
-					// InstitutionDataColumnEnum.DEPDOM, Integer.class));
+					nextInt(list, InstitutionDataColumnEnum.DEPDOM);
 					// FORM31
-					nextData(list, InstitutionDataColumnEnum.FORM31, String.class);
-					// HCTMULT
-
-					// System.out.println(nextData(list,
-					// InstitutionDataColumnEnum.HCTMULT, Integer.class));
-					// INSTAG
-					// System.out.println(nextData(list,
-					// InstitutionDataColumnEnum.INSTAG));
-					// MUTUAL
+					nextString(list, InstitutionDataColumnEnum.FORM31);
+					// HCTMULT ** Possible Boolean value **
+					nextInt(list, InstitutionDataColumnEnum.HCTMULT);
+					// INSTAG ** Possible Boolean value **
+					nextInt(list, InstitutionDataColumnEnum.INSTAG);
+					// MUTUAL ** Possible Boolean value **
+					nextInt(list, InstitutionDataColumnEnum.MUTUAL);
 					// NAMEHCR
+					nextString(list, InstitutionDataColumnEnum.NAMEHCR);
 					// NETINC
+					nextInt(list, InstitutionDataColumnEnum.NETINC);
 					// NETINCQ
-					// OFFDOM
-					// OFFFOR
-					// OFFOA,RSSDHCR,STALPHCR,STMULT,SUBCHAPS,ROAPTX,ROAPTXQ,TRUST,SPECGRP,
-					// SPECGRPN,TRACT,CSA,CSA_NO,CSA_FLG,CBSA,CBSA_NO,CBSA_METRO_NAME,
-					// CBSA_METRO,CBSA_METRO_FLG,CBSA_MICRO_FLG,CBSA_DIV,CBSA_DIV_NO,CBSA_DIV_FLG,CB
+					nextInt(list, InstitutionDataColumnEnum.NETINCQ);
+					// OFFDOM **numeric**
+					nextString(list, InstitutionDataColumnEnum.OFFDOM);
+					// OFFFOR **numeric**
+					nextString(list, InstitutionDataColumnEnum.OFFFOR);
+					// OFFOA **numeric**
+					nextString(list, InstitutionDataColumnEnum.OFFOA);
+					// RSSDHCR **numeric**
+					nextString(list, InstitutionDataColumnEnum.RSSDHCR);
+					// STALPHCR TODO: create dictionary table
+					nextString(list, InstitutionDataColumnEnum.STALPHCR);
+					// STMULT **numeric**
+					nextString(list, InstitutionDataColumnEnum.STMULT);
+					// SUBCHAPS
+					nextBoolean(list, InstitutionDataColumnEnum.SUBCHAPS);
+					// ROAPTX
+					nextBigDecimal(list, InstitutionDataColumnEnum.ROAPTX);
+					// ROAPTXQ
+					nextBigDecimal(list, InstitutionDataColumnEnum.ROAPTXQ);
+					// TRUST
+					nextInt(list, InstitutionDataColumnEnum.TRUST);
+					// SPECGRP TODO: create dictionary table
+					nextInt(list, InstitutionDataColumnEnum.SPECGRP);
+					// SPECGRPN TODO: create dictionary table
+					nextString(list, InstitutionDataColumnEnum.SPECGRPN);
+					// TRACT
+					nextBoolean(list, InstitutionDataColumnEnum.TRACT);
+					// CSA TODO: create dictionary table
+					nextString(list, InstitutionDataColumnEnum.CSA);
+					// CSA_NO
+					nextInt(list, InstitutionDataColumnEnum.CSA_NO);
+					// CSA_FLG
+					nextBoolean(list, InstitutionDataColumnEnum.CSA_FLG);
+					// CBSA TODO: create dictionary with the CBSA_NO
+					nextString(list, InstitutionDataColumnEnum.CBSA);
+					// CBSA_NO TODO: create dictionary table withthe CBSA
+					nextInt(list, InstitutionDataColumnEnum.CBSA_NO);
+					// CBSA_METRO_NAME TODO: create dictionary table
+					nextString(list, InstitutionDataColumnEnum.CBSA_METRO_NAME);
+					// CBSA_METRO TODO: create dictionary table with
+					nextInt(list, InstitutionDataColumnEnum.CBSA_METRO);
+					// CBSA_METRO_FLG
+					nextBoolean(list, InstitutionDataColumnEnum.CBSA_METRO_FLG);
+					// CBSA_MICRO_FLG
+					nextBoolean(list, InstitutionDataColumnEnum.CBSA_MICRO_FLG);
+					// CBSA_DIV TODO: create dictionary table with CBSA_DIV_NO
+					nextString(list, InstitutionDataColumnEnum.CBSA_DIV);
+					// CBSA_DIV_NO
+					nextInt(list, InstitutionDataColumnEnum.CBSA_DIV_NO);
+					// CBSA_DIV_FLG
+					nextBoolean(list, InstitutionDataColumnEnum.CBSA_DIV_FLG);
+					// CB done this way due to poor dataset
+					if (list.size() < InstitutionDataColumnEnum.values().length) {
+						// false;
+					} else {
+						pnextBoolean(list, InstitutionDataColumnEnum.CB);
+					}
 				}
 			}
 
@@ -325,66 +376,178 @@ public class UsFinanceFileParseApplication {
 		}
 	}
 
-	private static final String nextData(List<String> dataList, InstitutionDataColumnEnum eColumn) {
+	private static final String pnextString(List<String> dataList, InstitutionDataColumnEnum eColumn) {
+		String s = nextData(dataList, eColumn, String.class);
+		if (s != null) {
+			System.out.println(s);
+		}
+		return s;
+	}
+
+	private static final String nextString(List<String> dataList, InstitutionDataColumnEnum eColumn) {
 		return nextData(dataList, eColumn, String.class);
 	}
 
-	private static final <T> T nextData(List<String> dataList, InstitutionDataColumnEnum eColumn, Class<T> dataType) {
-		if (dataType.equals(String.class)) {
-			return (dataType.cast(StringHelper.stringOrNull(dataList.get(eColumn.ordinal()))));
-		} else if (dataType.equals(Float.class)) {
-			return (dataType.cast(StringHelper.floatOrNull(dataList.get(eColumn.ordinal()).replaceAll(",", ""))));
-		} else if (dataType.equals(Date.class)) {
-			return (dataType.cast(StringHelper.dateOrNull(dataList.get(eColumn.ordinal()))));
-		} else if (dataType.equals(Integer.class)) {
-			return (dataType.cast(integerOrNull(dataList.get(eColumn.ordinal()).replaceAll(",", ""))));
-		} else if (dataType.equals(Byte.class)) {
-			return (dataType.cast(StringHelper.byteOrNull(dataList.get(eColumn.ordinal()))));
-		} else if (dataType.equals(Boolean.class)) {
-			return (dataType.cast(StringHelper.booleanOrNull(dataList.get(eColumn.ordinal()))));
+	private static final Float nextFloat(List<String> dataList, InstitutionDataColumnEnum eColumn) {
+		return nextData(dataList, eColumn, Float.class);
+	}
+
+	private static final Date nextDate(List<String> dataList, InstitutionDataColumnEnum eColumn) {
+		return nextData(dataList, eColumn, Date.class);
+	}
+
+	private static final Integer pnextInt(List<String> dataList, InstitutionDataColumnEnum eColumn) {
+		Integer i = nextData(dataList, eColumn, Integer.class);
+		if (i != null) {
+			System.out.println(i);
+		}
+		return i;
+	}
+
+	private static final Integer nextInt(List<String> dataList, InstitutionDataColumnEnum eColumn) {
+		return nextData(dataList, eColumn, Integer.class);
+	}
+
+	private static final Byte nextByte(List<String> dataList, InstitutionDataColumnEnum eColumn) {
+		return nextData(dataList, eColumn, Byte.class);
+	}
+
+	private static final Boolean pnextBoolean(List<String> dataList, InstitutionDataColumnEnum eColumn) {
+		Boolean b = nextData(dataList, eColumn, Boolean.class);
+		if (b != null) {
+			System.out.println(b);
+		}
+		return b;
+	}
+
+	private static final Boolean nextBoolean(List<String> dataList, InstitutionDataColumnEnum eColumn) {
+		return nextData(dataList, eColumn, Boolean.class);
+	}
+
+	private static final BigInteger pnextBigInteger(List<String> dataList, InstitutionDataColumnEnum eColumn) {
+		BigInteger i = nextData(dataList, eColumn, BigInteger.class);
+		if (i != null) {
+			System.out.println(i);
+		}
+		return i;
+	}
+
+	private static final BigInteger nextBigInteger(List<String> dataList, InstitutionDataColumnEnum eColumn) {
+		return nextData(dataList, eColumn, BigInteger.class);
+	}
+
+	private static final BigDecimal pnextBigDecimal(List<String> dataList, InstitutionDataColumnEnum eColumn) {
+		BigDecimal bd = nextData(dataList, eColumn, BigDecimal.class);
+		if (bd != null) {
+			System.out.println(bd);
+		}
+
+		return bd;
+	}
+
+	private static final BigDecimal nextBigDecimal(List<String> dataList, InstitutionDataColumnEnum eColumn) {
+		return nextData(dataList, eColumn, BigDecimal.class);
+	}
+
+	private static final <T> T nextData(List<String> dataList, InstitutionDataColumnEnum eColumn, Class<T> type) {
+		if (type.equals(String.class)) {
+			return (type.cast(StringHelper.stringOrNull(dataList.get(eColumn.ordinal()))));
+		}
+
+		if (type.equals(Float.class)) {
+			return (type.cast(StringHelper.floatOrNull(dataList.get(eColumn.ordinal()).replaceAll(",", ""))));
+		}
+
+		if (type.equals(Date.class)) {
+			return (type.cast(StringHelper.dateOrNull(dataList.get(eColumn.ordinal()))));
+		}
+
+		if (type.equals(Integer.class)) {
+			return (type.cast(StringHelper.integerOrNull(dataList.get(eColumn.ordinal()).replaceAll(",", ""))));
+		}
+
+		if (type.equals(Byte.class)) {
+			return (type.cast(StringHelper.byteOrNull(dataList.get(eColumn.ordinal()))));
+		}
+
+		if (type.equals(Boolean.class)) {
+			return (type.cast(StringHelper.booleanOrNull(dataList.get(eColumn.ordinal()))));
+		}
+
+		if (type.equals(BigInteger.class)) {
+			return (type.cast(StringHelper.bigIntegerOrNull(dataList.get(eColumn.ordinal()).replaceAll(",", ""))));
+		}
+
+		if (type.equals(BigDecimal.class)) {
+			return (type.cast(StringHelper.bigDecimalOrNull(dataList.get(eColumn.ordinal()).replaceAll(",", ""))));
 		}
 
 		return null;
 	}
 
-	private static LinkedList<String> newDataIterator(final String data) {
-		final LinkedList<String> list = new LinkedList<>();
+	private static Map<InstitutionDataColumnEnum, String> newDataMap(final String data) {
+		final Map<InstitutionDataColumnEnum, String> map = new HashMap<>();
+
+		String string = data.trim();
+
+		for (InstitutionDataColumnEnum eColumn : InstitutionDataColumnEnum.values()) {
+			int startIdx = 0;
+			int endIdx = 0;
+
+			if (string.charAt(0) == ',') {
+				map.put(eColumn, StringHelper.EMPTY_STRING);
+				string = string.substring(1);
+			} else if (string.charAt(0) == '"') {
+				startIdx = 1;
+				endIdx = string.indexOf("\",", 1);
+
+				map.put(eColumn, string.substring(startIdx, endIdx));
+				string = string.substring(string.indexOf(',', endIdx) + 1);
+			} else {
+				endIdx = string.indexOf(',');
+				if (endIdx > 0) {
+					map.put(eColumn, string.substring(startIdx, endIdx));
+					string = string.substring(endIdx + 1);
+				} else {
+					map.put(eColumn, string.substring(startIdx, string.length()));
+					string = null;
+				}
+			}
+		}
+
+		return map;
+	}
+
+	private static List<String> newDataIterator(final String data) {
+		final List<String> list = new LinkedList<>();
 
 		String string = data.trim();
 
 		while (StringHelper.hasText(string)) {
-			int idxStart = 0;
-			int idxEnd = 0;
+			int startIdx = 0;
+			int endIdx = 0;
 
 			if (string.charAt(0) == ',') {
 				list.add(StringHelper.EMPTY_STRING);
 				string = string.substring(1);
 			} else if (string.charAt(0) == '"') {
-				idxStart = 1;
-				idxEnd = string.indexOf('"', 1);
+				startIdx = 1;
+				endIdx = string.indexOf("\",", 1);
 
-				list.add(string.substring(idxStart, idxEnd));
-				string = string.substring(string.indexOf(',', idxEnd) + 1);
+				list.add(string.substring(startIdx, endIdx));
+				string = string.substring(string.indexOf(',', endIdx) + 1);
 			} else {
-				idxEnd = string.indexOf(',');
-				if (idxEnd > 0) {
-					list.add(string.substring(idxStart, idxEnd));
-					string = string.substring(idxEnd + 1);
+				endIdx = string.indexOf(',');
+				if (endIdx > 0) {
+					list.add(string.substring(startIdx, endIdx));
+					string = string.substring(endIdx + 1);
 				} else {
-					list.add(string.substring(idxStart, string.length()));
+					list.add(string.substring(startIdx, string.length()));
 					string = null;
 				}
 			}
 		}
 
 		return list;
-	}
-
-	private static Integer integerOrNull(String data) {
-		if (StringHelper.hasText(data)) {
-			return Integer.valueOf(data.trim());
-		}
-
-		return null;
 	}
 }
