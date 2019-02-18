@@ -70,6 +70,10 @@ public class FdicInstitutionDirectory {
 		}
 	}
 
+	public static void main(String[] args) {
+		readAllFdicDirectoryRecords();
+	}
+
 	public static void readAllFdicDirectoryRecords() {
 
 		try (Session session = new Configuration().configure().buildSessionFactory().openSession()) {
