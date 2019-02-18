@@ -46,21 +46,6 @@ public final class InstitutionDataApplication {
 		}
 	}
 
-	private static void print(final FailureAssistanceTransaction transaction) {
-		System.out.println(transaction.getInstitutionName());
-		System.out.println(transaction.getCert());
-		System.out.println(transaction.getFin());
-		System.out.println(transaction.getLocation());
-		System.out.println(transaction.getEffectiveDate());
-		System.out.println(transaction.getInsFund());
-		System.out.println(transaction.getTransactionType());
-		System.out.println(transaction.getCharterClass());
-		System.out.println(transaction.getFailureOrAssistance());
-		System.out.println(transaction.getTotalDeposits());
-		System.out.println(transaction.getTotalAssets());
-		System.out.println(transaction.getEstimatedLoss());
-	}
-
 	public static void loadFailureAssistanceTransaction() {
 		try (final Scanner fileScanner = new Scanner(new FileInputStream("data/hsobReportDataOnly.csv"))) {
 			final ArrayList<FailureAssistanceTransaction> transactions = new ArrayList<>();

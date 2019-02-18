@@ -5,10 +5,8 @@ import java.io.FileNotFoundException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.sql.Date;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Scanner;
 
 import com.usdataproject.data.model.Institution;
@@ -16,17 +14,6 @@ import com.usdataproject.util.helper.InstitutionDataColumnEnum;
 import com.usdataproject.util.helper.StringHelper;
 
 public class UsFinanceFileParseApplication {
-
-	public static void main1(String[] args) {
-		String s1 = "Nebraska,5371,12383,0,103 South Fourth Street,\"39,078\",N,223,0,0,0,0,3960,OCC,N,Albion,3,0,,Boone,2005-11-14,00000,\"33,253\",2005-11-10,2005-11-10,,1879-01-01,11,Kansas City,Kansas City,10,395452,1,Grand Island,0,1,BIF,,1934-01-01,00000,1,1,0,1,0,0,0,,The First National Bank of Albion,31999,0,5,West,2005-11-14,4,OCC,2005-09-30,2017-09-30,0,,,,,2017-12-28,0,N,NE,31011,31,68620,11,4,3624,31999,31DEC9999,31DEC9999,0,,,,,,,,,,,,,,,,,,,1,,,,,,,,,,,,,,,,,,,,,,,,,,0,0,,0,,0,0,0,,0,0,";
-		System.out.println(s1);
-		List<String> list = newDataIterator(s1);
-		System.out.println(list.size());
-		System.out.println(InstitutionDataColumnEnum.values().length);
-		for (String s : list) {
-			System.out.println("s:(" + s + ")");
-		}
-	}
 
 	public static void main(String[] args) {
 		try (final Scanner fileScanner = new Scanner(new FileInputStream("data/institutions2_dataOnly.csv"))) {
@@ -247,7 +234,7 @@ public class UsFinanceFileParseApplication {
 					// ULTCERT
 					nextData(list, InstitutionDataColumnEnum.ULTCERT, Integer.class);
 					// CFPBEFFDTE
-					nextData(list, InstitutionDataColumnEnum.CFPBEFFDTE, Date.class);
+					nextDate(list, InstitutionDataColumnEnum.CFPBEFFDTE);
 					// CFPBENDDTE
 					nextData(list, InstitutionDataColumnEnum.CFPBENDDTE, Date.class);
 					// CFPBFLAG
@@ -485,65 +472,32 @@ public class UsFinanceFileParseApplication {
 		return null;
 	}
 
-	private static Map<InstitutionDataColumnEnum, String> newDataMap(final String data) {
-		final Map<InstitutionDataColumnEnum, String> map = new HashMap<>();
-
-		String string = data.trim();
-
-		for (InstitutionDataColumnEnum eColumn : InstitutionDataColumnEnum.values()) {
-			int startIdx = 0;
-			int endIdx = 0;
-
-			if (string.charAt(0) == ',') {
-				map.put(eColumn, StringHelper.EMPTY_STRING);
-				string = string.substring(1);
-			} else if (string.charAt(0) == '"') {
-				startIdx = 1;
-				endIdx = string.indexOf("\",", 1);
-
-				map.put(eColumn, string.substring(startIdx, endIdx));
-				string = string.substring(string.indexOf(',', endIdx) + 1);
-			} else {
-				endIdx = string.indexOf(',');
-				if (endIdx > 0) {
-					map.put(eColumn, string.substring(startIdx, endIdx));
-					string = string.substring(endIdx + 1);
-				} else {
-					map.put(eColumn, string.substring(startIdx, string.length()));
-					string = null;
-				}
-			}
-		}
-
-		return map;
-	}
-
 	private static List<String> newDataIterator(final String data) {
 		final List<String> list = new LinkedList<>();
 
-		String string = data.trim();
+		String s = data.trim();
 
-		while (StringHelper.hasText(string)) {
-			int startIdx = 0;
-			int endIdx = 0;
+		while (StringHelper.hasText(s)) {
+			int start = 0;
+			int end = 0;
 
-			if (string.charAt(0) == ',') {
+			if (s.charAt(0) == ',') {
 				list.add(StringHelper.EMPTY_STRING);
-				string = string.substring(1);
-			} else if (string.charAt(0) == '"') {
-				startIdx = 1;
-				endIdx = string.indexOf("\",", 1);
+				s = s.substring(1);
+			} else if (s.charAt(0) == '"') {
+				start = 1;
+				end = s.indexOf("\",", 1);
 
-				list.add(string.substring(startIdx, endIdx));
-				string = string.substring(string.indexOf(',', endIdx) + 1);
+				list.add(s.substring(start, end));
+				s = s.substring(s.indexOf(',', end) + 1);
 			} else {
-				endIdx = string.indexOf(',');
-				if (endIdx > 0) {
-					list.add(string.substring(startIdx, endIdx));
-					string = string.substring(endIdx + 1);
+				end = s.indexOf(',');
+				if (end > 0) {
+					list.add(s.substring(start, end));
+					s = s.substring(end + 1);
 				} else {
-					list.add(string.substring(startIdx, string.length()));
-					string = null;
+					list.add(s.substring(start, s.length()));
+					s = null;
 				}
 			}
 		}

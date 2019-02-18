@@ -150,4 +150,22 @@ public class FailureAssistanceTransaction {
 	public void setEstimatedLoss(String estimatedLoss) {
 		this.estimatedLoss = estimatedLoss;
 	}
+
+	@Override
+	public String toString() {
+		final StringBuilder sb = new StringBuilder();
+		sb.append("institutionName:" + institutionName + "\n");
+		sb.append("cert:" + cert + "\n");
+		sb.append("fin:" + fin + "\n");
+		sb.append("location:" + location + "\n");
+		sb.append("effectiveDate:" + effectiveDate + "\n");
+		sb.append("insFund:" + insFund + "\n");
+		sb.append("transactionType:" + transactionType + "\n");
+		sb.append("charterClass:" + charterClass + "\n");
+		sb.append("failureOrAssistance:" + failureOrAssistance + "\n");
+		sb.append("totalDeposits:" + totalDeposits + "\n");
+		sb.append("totalAssets:" + totalAssets + "\n");
+		sb.append("estimatedLoss:" + estimatedLoss + "\n");
+		return sb.toString();
+	}
 }
